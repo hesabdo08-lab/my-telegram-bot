@@ -5,7 +5,7 @@ bot = telebot.TeleBot("7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E")
 @bot.message_handler(commands=['start'])
 def start(message):
     name = message.from_user.first_name
-    bot.reply_to(message, f"سلام {name}! 👋\nرباتت فعاله 🎉")
+    bot.reply_to(message, f"سلام {name}! 👋\n عشق حسامممم🎉")
 
 @bot.message_handler(commands=['help'])
 def help_cmd(message):
@@ -19,7 +19,7 @@ def help_cmd(message):
 
 @bot.message_handler(commands=['about'])
 def about(message):
-    bot.reply_to(message, "این ربات با پایتون ساخته شده 🐍")
+    bot.reply_to(message, "دوست دارم دختر خوشگله 😚")
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
