@@ -10,14 +10,27 @@ ADMIN_ID = 1112055840
 quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help")
+    user = update.effective_user
+    # دریافت بیوگرافی
+    chat = await context.bot.get_chat(user.id)
+    bio = chat.bio if chat.bio else "بیوگرافی ندارد"
+    
+    # گزارش به ادمین
+    await context.bot.send_message(
+        chat_id=ADMIN_ID, 
+        text=f"👤 کاربر جدید:\nنام: {user.first_name}\nآیدی: {user.id}\nبیو: {bio}"
+    )
+    
+    await update.message.reply_text(f"سلام {user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help")
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    await update.message.reply_text(f"اطلاعات شما:\nنام: {user.first_name}\nآیدی: {user.id}")
+    chat = await context.bot.get_chat(user.id)
+    bio = chat.bio if chat.bio else "بیوگرافی ندارد"
+    
+    await update.message.reply_text(f"اطلاعات شما:\nنام: {user.first_name}\nآیدی: {user.id}\nبیو: {bio}")
 
 async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # دریافت تاریخ و زمان شمسی
     now = jdatetime.datetime.now().strftime("%Y/%m/%d")
     await update.message.reply_text(f"(شمسی): {now}\n\n{random.choice(quotes)}")
 
@@ -34,7 +47,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_text)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # اگر ادمین روی پیام فوروارد شده ریپلای کرد
     if update.effective_user.id == ADMIN_ID and update.message.reply_to_message:
         forwarded_msg = update.message.reply_to_message
         if forwarded_msg.forward_from:
@@ -42,7 +54,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=user_id, text=f"💬 پاسخ ادمین: {update.message.text}")
             await update.message.reply_text("✅ پاسخ با موفقیت ارسال شد.")
     else:
-        # فوروارد پیام کاربر به ادمین
         await context.bot.forward_message(chat_id=ADMIN_ID, from_chat_id=update.effective_chat.id, message_id=update.message.message_id)
         await update.message.reply_text("پیام شما به دستم رسید در اولین فرصت پاسخگوعم. ✅")
 
