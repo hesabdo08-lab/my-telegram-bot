@@ -1,29 +1,52 @@
-import telebot
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import datetime
+import random
 
-bot = telebot.TeleBot("7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E")
+# تنظیمات اولیه
+TOKEN = "YOUR_TOKEN"
+ADMIN_ID = 123456789  # آیدی عددی خودت رو اینجا وارد کن
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    name = message.from_user.first_name
-    bot.reply_to(message, f"سلام {name}! 👋\n عشق حسامممم🎉")
+quotes = ["امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
-@bot.message_handler(commands=['help'])
-def help_cmd(message):
-    text = """
-🤖 دستورات:
-/start - شروع
-/help - راهنما
-/about - درباره
-"""
-    bot.reply_to(message, text)
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! به رباتِ من خوش اومدی. برای دیدن دستورات از /help استفاده کن. 🤖✨")
 
-@bot.message_handler(commands=['about'])
-def about(message):
-    bot.reply_to(message, "دوست دارم دختر خوشگله 😚")
+async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    await update.message.reply_text(f"اطلاعات شما:\nنام: {user.first_name}\nآیدی: {user.id}")
 
-@bot.message_handler(func=lambda m: True)
-def echo_all(message):
-    bot.reply_to(message, "دستور ناشناس 🤷\n/help رو بزن")
+async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    await update.message.reply_text(f"زمان: {now}\n\n{random.choice(quotes)}")
 
-print("🤖 ربات روشن شد")
-bot.polling()
+async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("🚀 تبلیغات: برای همکاری با ما به آیدی @YourID پیام بدید!")
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_text = (
+        "لیست دستورات ربات: 📋\n\n"
+        "/start - شروع کار\n/info - اطلاعات کاربری\n"
+        "/time - زمان و جمله انگیزشی\n/ads - تبلیغات\n/help - راهنما\n\n"
+        "هر پیامی غیر از دستورات بفرستی، ناشناس به دست من می‌رسه! 📩"
+    )
+    await update.message.reply_text(help_text)
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # فوروارد پیام کاربر به ادمین
+    await context.bot.forward_message(chat_id=ADMIN_ID, from_chat_id=update.effective_chat.id, message_id=update.message.message_id)
+    await update.message.reply_text("پیام شما به دست صاحب ربات رسید. ✅")
+
+# راه‌اندازی ربات
+app = Application.builder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("info", info))
+app.add_handler(CommandHandler("time", time_quote))
+app.add_handler(CommandHandler("ads", ads))
+app.add_handler(CommandHandler("help", help_command))
+# هندلر برای پیام‌های متنی (غیر از دستورات)
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+print("ربات روشن شد...")
+app.run_polling()
