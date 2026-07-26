@@ -18,7 +18,7 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # دریافت تاریخ و زمان شمسی
-    now = jdatetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    now = jdatetime.datetime.now()
     await update.message.reply_text(f"(شمسی): {now}\n\n{random.choice(quotes)}")
 
 async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
