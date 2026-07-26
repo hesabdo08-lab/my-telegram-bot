@@ -10,7 +10,7 @@ ADMIN_ID = 1112055840
 quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! \n/help به رباتِ من خوش اومدی. 🤖✨")
+    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! \n\n/help به رباتِ من خوش اومدی. 🤖✨")
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -18,7 +18,7 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # دریافت تاریخ و زمان شمسی
-    now = jdatetime.datetime.now()
+    now = jdatetime.datetime.now().strftime("%Y/%m/%d")
     await update.message.reply_text(f"(شمسی): {now}\n\n{random.choice(quotes)}")
 
 async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
