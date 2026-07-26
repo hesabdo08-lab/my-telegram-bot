@@ -113,7 +113,6 @@ async def add_cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await update.message.reply_text("❌ عملیات لغو شد.")
     return ConversationHandler.END
 
-
 # ---------------------------------------------------------
 # سایر دستورات
 # ---------------------------------------------------------
@@ -152,21 +151,74 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/time - تاریخ و جمله انگیزشی\n"
         "/ads - تبلیغات\n"
         "/add - الارم فعالیت\n"
+        "/reply - ارسال پیام مستقیم به یک کاربر (فقط ادمین)\n"
         "/help - راهنما\n\n"
         "هر وقت خواستی می‌تونی همینجا برام پیام بفرستی، مستقیم به دستم می‌رسه."
     )
     await update.message.reply_text(help_text)
 
 
+# ---------------------------------------------------------
+# دستور جدید: /reply <user_id> <متن>  (فقط برای ادمین)
+# ---------------------------------------------------------
+async def reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return  # فقط ادمین اجازه‌ی استفاده داره
+
+    if len(context.args) < 2:
+        await update.message.reply_text(
+            "استفاده‌ی صحیح:\n/reply <آیدی کاربر> <متن پیام>\n\nمثال:\n/reply 123456789 سلام، چطور می‌تونم کمکتون کنم؟"
+        )
+        return
+
+    try:
+        target_id = int(context.args[0])
+    except ValueError:
+        await update.message.reply_text("آیدی کاربر باید عدد باشه.")
+        return
+
+    message_text = " ".join(context.args[1:])
+
+    try:
+        await context.bot.send_message(target_id, f"💬 پاسخ ادمین: {message_text}")
+        await update.message.reply_text("✅ پیام ارسال شد.")
+    except Exception as e:
+        await update.message.reply_text(f"❌ ارسال نشد: {e}")
+
+
+# ---------------------------------------------------------
+# فوروارد پیام کاربر به ادمین + پاسخ ادمین با ریپلای
+# ---------------------------------------------------------
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # اگر ادمین داره روی یک پیامِ فوروارد شده ریپلای می‌کنه
     if update.effective_user.id == ADMIN_ID and update.message.reply_to_message:
-        forwarded_msg = update.message.reply_to_message
-        if forwarded_msg.forward_from:
-            await context.bot.send_message(forwarded_msg.forward_from.id, f"💬 پاسخ ادمین: {update.message.text}")
-            await update.message.reply_text("✅ پاسخ ارسال شد.")
-    else:
-        await context.bot.forward_message(ADMIN_ID, update.effective_chat.id, update.message.message_id)
-        await update.message.reply_text("پیام شما به دستم رسید. ✅")
+        replied = update.message.reply_to_message
+        user_map = context.bot_data.get("user_map", {})
+        target_id = user_map.get(replied.message_id)
+
+        if target_id is None and replied.forward_from:
+            # اگر به هر دلیلی توی نگاشت نبود ولی forward_from موجود بود
+            target_id = replied.forward_from.id
+
+        if target_id:
+            try:
+                await context.bot.send_message(target_id, f"💬 پاسخ ادمین: {update.message.text}")
+                await update.message.reply_text("✅ پاسخ ارسال شد.")
+            except Exception as e:
+                await update.message.reply_text(f"❌ ارسال نشد: {e}")
+        else:
+            await update.message.reply_text(
+                "⚠️ نتونستم بفهمم این پیام مربوط به کدوم کاربره.\n"
+                "از دستور /reply <آیدی کاربر> <متن> استفاده کن."
+            )
+        return
+
+    # پیام عادی از طرف کاربر -> فوروارد به ادمین + ثبت در نگاشت
+    forwarded = await context.bot.forward_message(
+        ADMIN_ID, update.effective_chat.id, update.message.message_id
+    )
+    context.bot_data.setdefault("user_map", {})[forwarded.message_id] = update.effective_user.id
+    await update.message.reply_text("پیام شما به دستم رسید. ✅")
 
 
 # ---------------------------------------------------------
@@ -189,6 +241,7 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("info", info))
 app.add_handler(CommandHandler("time", time_quote))
 app.add_handler(CommandHandler("ads", ads))
+app.add_handler(CommandHandler("reply", reply_command))
 app.add_handler(CommandHandler("help", help_command))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
