@@ -10,7 +10,7 @@ ADMIN_ID = 1112055840
 quotes = ["امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨")
+    await update.message.reply_text(f"سلام {update.effective_user.first_name}/help عزیز! به رباتِ من خوش اومدی. 🤖✨")
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -22,13 +22,13 @@ async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"زمان (شمسی): {now}\n\n{random.choice(quotes)}")
 
 async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🚀 تبلیغات: برای همکاری با ما به آیدی @YourID پیام بدید!")
+    await update.message.reply_text("🚀 تبلیغات: برای همکاری با ما به آیدی @Hesamopv پیام بدید!")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
         "لیست دستورات ربات: 📋\n\n"
         "/start - شروع کار\n/info - اطلاعات کاربری\n"
-        "/time - زمان شمسی و جمله انگیزشی\n/ads - تبلیغات\n/help - راهنما\n\n"
+        "/time - تاریخ شمسی\n/ads - تبلیغات\n/help - راهنما\n\n"
         "هر پیامی غیر از دستورات بفرستی، ناشناس به دست من می‌رسه! 📩"
     )
     await update.message.reply_text(help_text)
@@ -44,7 +44,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         # فوروارد پیام کاربر به ادمین
         await context.bot.forward_message(chat_id=ADMIN_ID, from_chat_id=update.effective_chat.id, message_id=update.message.message_id)
-        await update.message.reply_text("پیام شما به دست صاحب ربات رسید. ✅")
+        await update.message.reply_text("پیام شما به دستم ربات رسید در اولین فرصت پاسخگوعم. ✅")
 
 # راه‌اندازی ربات
 app = Application.builder().token(TOKEN).build()
