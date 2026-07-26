@@ -7,10 +7,10 @@ import random
 TOKEN = "7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E"
 ADMIN_ID = 1112055840
 
-quotes = ["امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
+quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"سلام {update.effective_user.first_name}/help عزیز! به رباتِ من خوش اومدی. 🤖✨")
+    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! به رباتِ من خوش اومدی. \n/help🤖✨")
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -19,7 +19,7 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def time_quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # دریافت تاریخ و زمان شمسی
     now = jdatetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    await update.message.reply_text(f"زمان (شمسی): {now}\n\n{random.choice(quotes)}")
+    await update.message.reply_text(f"(شمسی): {now}\n\n{random.choice(quotes)}")
 
 async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🚀 تبلیغات: برای همکاری با ما به آیدی @Hesamopv پیام بدید!")
@@ -44,7 +44,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         # فوروارد پیام کاربر به ادمین
         await context.bot.forward_message(chat_id=ADMIN_ID, from_chat_id=update.effective_chat.id, message_id=update.message.message_id)
-        await update.message.reply_text("پیام شما به دستم ربات رسید در اولین فرصت پاسخگوعم. ✅")
+        await update.message.reply_text("پیام شما به دستم رسید در اولین فرصت پاسخگوعم. ✅")
 
 # راه‌اندازی ربات
 app = Application.builder().token(TOKEN).build()
