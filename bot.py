@@ -70,23 +70,45 @@ async def add_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     task_time = context.user_data['task_time']
     activity = context.user_data['activity']
     hour, minute = map(int, task_time.split(':'))
-    chat_id = query.from_user.id
+    user = query.from_user
+    chat_id = user.id
 
-    now_iran = datetime.datetime.now(IRAN_TZ)
-    target_time = now_iran.replace(hour=hour, minute=minute, second=0, microsecond=0)
-    if target_time < now_iran:
-        target_time += datetime.timedelta(days=1)
-    delta = (target_time - now_iran).total_seconds()
-
-    async def send_reminder(ctx: ContextTypes.DEFAULT_TYPE):
-        await ctx.bot.send_message(
-            chat_id=ctx.job.chat_id,
-            text=f"⏰ یادآوری: وقتشه که فعالیتِ '{ctx.job.data}' رو انجام بدی!"
+    if context.job_queue is None:
+        await query.edit_message_text(
+            "⚠️ امکان تنظیم یادآوری نیست چون job-queue نصب نشده.\n"
+            "این دستور رو تو سرور اجرا کن:\n"
+            "pip install \"python-telegram-bot[job-queue]\""
         )
+        context.user_data.clear()
+        return ConversationHandler.END
 
-    context.job_queue.run_once(send_reminder, when=delta, chat_id=chat_id, data=activity)
+    try:
+        now_iran = datetime.datetime.now(IRAN_TZ)
+        target_time = now_iran.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if target_time < now_iran:
+            target_time += datetime.timedelta(days=1)
+        delta = (target_time - now_iran).total_seconds()
 
-    await query.edit_message_text(f"✅ یادآوری برای ساعت {task_time} (به وقت ایران) ثبت شد.")
+        async def send_reminder(ctx: ContextTypes.DEFAULT_TYPE):
+            await ctx.bot.send_message(
+                chat_id=ctx.job.chat_id,
+                text=f"⏰ یادآوری: وقتشه که فعالیتِ '{ctx.job.data}' رو انجام بدی!"
+            )
+
+        context.job_queue.run_once(send_reminder, when=delta, chat_id=chat_id, data=activity)
+
+        await query.edit_message_text(f"✅ یادآوری برای ساعت {task_time} (به وقت ایران) ثبت شد.")
+
+        await context.bot.send_message(
+            ADMIN_ID,
+            f"🔔 یادآوری جدید ثبت شد:\n"
+            f"کاربر: {user.first_name} (آیدی: {user.id})\n"
+            f"ساعت: {task_time}\n"
+            f"فعالیت: {activity}"
+        )
+    except Exception as e:
+        await query.edit_message_text(f"❌ خطا در ثبت یادآوری: {e}")
+
     context.user_data.clear()
     return ConversationHandler.END
 
@@ -127,8 +149,12 @@ async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
         "لیست دستورات:\n"
-        "/start\n/info\n/time\n/ads\n/add\n/help\n\n"
-        "/add: اول ازت ساعت رو می‌پرسه، بعد فعالیت رو، و در آخر با یه دکمه تایید مطمئن می‌شه."
+        "/start - شروع ربات\n"
+        "/info - اطلاعات کاربر\n"
+        "/time - تاریخ و جمله انگیزشی\n"
+        "/ads - تبلیغات\n"
+        "/add - الارم فعالیت\n"
+        "/help - راهنما"
     )
     await update.message.reply_text(help_text)
 
