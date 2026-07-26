@@ -6,6 +6,7 @@ from telegram.ext import (
 import jdatetime
 import random
 import datetime
+import asyncio
 
 # تنظیمات اولیه
 TOKEN = "7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E"
@@ -73,15 +74,6 @@ async def add_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     chat_id = user.id
 
-    if context.job_queue is None:
-        await query.edit_message_text(
-            "⚠️ امکان تنظیم یادآوری نیست چون job-queue نصب نشده.\n"
-            "این دستور رو تو سرور اجرا کن:\n"
-            "pip install \"python-telegram-bot[job-queue]\""
-        )
-        context.user_data.clear()
-        return ConversationHandler.END
-
     try:
         now_iran = datetime.datetime.now(IRAN_TZ)
         target_time = now_iran.replace(hour=hour, minute=minute, second=0, microsecond=0)
@@ -89,13 +81,16 @@ async def add_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             target_time += datetime.timedelta(days=1)
         delta = (target_time - now_iran).total_seconds()
 
-        async def send_reminder(ctx: ContextTypes.DEFAULT_TYPE):
-            await ctx.bot.send_message(
-                chat_id=ctx.job.chat_id,
-                text=f"⏰ یادآوری: وقتشه که فعالیتِ '{ctx.job.data}' رو انجام بدی!"
+        async def send_reminder_later(bot, delay, cid, act):
+            await asyncio.sleep(delay)
+            await bot.send_message(
+                chat_id=cid,
+                text=f"⏰ یادآوری: وقتشه که فعالیتِ '{act}' رو انجام بدی!"
             )
 
-        context.job_queue.run_once(send_reminder, when=delta, chat_id=chat_id, data=activity)
+        context.application.create_task(
+            send_reminder_later(context.bot, delta, chat_id, activity)
+        )
 
         await query.edit_message_text(f"✅ یادآوری برای ساعت {task_time} (به وقت ایران) ثبت شد.")
 
@@ -127,7 +122,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await context.bot.get_chat(user.id)
     bio = chat.bio if chat.bio else "بیوگرافی ندارد"
     await context.bot.send_message(ADMIN_ID, f"👤 کاربر جدید:\nنام: {user.first_name}\nآیدی: {user.id}\nبیو: {bio}")
-    await update.message.reply_text(f"سلام {user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help")
+    await update.message.reply_text(
+        f"سلام {user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help\n\n"
+        "هر وقت خواستی می‌تونی همینجا برام پیام بفرستی، مستقیم به دستم می‌رسه."
+    )
 
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -154,7 +152,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/time - تاریخ و جمله انگیزشی\n"
         "/ads - تبلیغات\n"
         "/add - الارم فعالیت\n"
-        "/help - راهنما"
+        "/help - راهنما\n\n"
+        "هر وقت خواستی می‌تونی همینجا برام پیام بفرستی، مستقیم به دستم می‌رسه."
     )
     await update.message.reply_text(help_text)
 
