@@ -4,8 +4,8 @@ import datetime
 import random
 
 # تنظیمات اولیه
-TOKEN = "YOUR_TOKEN"
-ADMIN_ID = 123456789  # آیدی عددی خودت رو اینجا وارد کن
+TOKEN = "7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E"
+ADMIN_ID = 1112055840  # آیدی عددی خودت رو اینجا وارد کن
 
 quotes = ["امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
