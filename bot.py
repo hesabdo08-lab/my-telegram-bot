@@ -10,7 +10,7 @@ ADMIN_ID = 1112055840
 quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! \n\n/help به رباتِ من خوش اومدی. 🤖✨")
+    await update.message.reply_text(f"سلام {update.effective_user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help")
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
