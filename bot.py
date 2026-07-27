@@ -9,10 +9,10 @@ import datetime
 import asyncio
 
 # تنظیمات اولیه
-TOKEN = "7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E"
+TOKEN = "8988859902:AAEico37jn-lwKyUqToyKRF_QUzGWFq5uI0"
 ADMIN_ID = 1112055840
 
-quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!", "سخت‌کوشی، کلیدِ طلاییِ موفقیته.", "به خودت ایمان داشته باش."]
+quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!😉", "سخت‌کوشی، کلیدِ طلاییِ موفقیته✨.", "به خودت ایمان داشته باش."]
 
 IRAN_TZ = datetime.timezone(datetime.timedelta(hours=3, minutes=30))
 
@@ -122,8 +122,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bio = chat.bio if chat.bio else "بیوگرافی ندارد"
     await context.bot.send_message(ADMIN_ID, f"👤 کاربر جدید:\nنام: {user.first_name}\nآیدی: {user.id}\nبیو: {bio}")
     await update.message.reply_text(
-        f"سلام {user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n/help\n\n"
-        "هر وقت خواستی می‌تونی همینجا برام پیام بفرستی، مستقیم به دستم می‌رسه."
+        f"سلام {user.first_name} عزیز! به رباتِ من خوش اومدی. 🤖✨ \n را بزنید /help برای دیدن لیست دستورات گزینه\n\n"
+        "✅👇🏽:هر وقت خواستی می‌تونی همینجا برام پیام بفرستی، مستقیم به دستم می‌رسه."
     )
 
 
