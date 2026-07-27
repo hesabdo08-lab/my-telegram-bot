@@ -9,7 +9,7 @@ import datetime
 import asyncio
 
 # تنظیمات اولیه
-TOKEN = "8988859902:AAEico37jn-lwKyUqToyKRF_QUzGWFq5uI0"
+TOKEN = "7097059884:AAGz4ZO-f84oJGxxHIsnjcwIUFIBbCh4y0E"
 ADMIN_ID = 1112055840
 
 quotes = ["🚀امروز، روزِ ساختنِ آینده‌ته!😉", "سخت‌کوشی، کلیدِ طلاییِ موفقیته✨.", "به خودت ایمان داشته باش."]
